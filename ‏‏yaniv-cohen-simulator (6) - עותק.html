@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>סימולטור שאגת הארי</title>
+<style>
+body{font-family:Arial;background:#f7f6f2;padding:20px}
+.card{background:#fff;padding:20px;border-radius:12px;max-width:600px;margin:auto}
+input,button{padding:10px;margin:5px;width:100%}
+.result{font-size:22px;font-weight:bold;color:#0e6b71}
+</style>
+</head>
+
+<body>
+<div class="card">
+<h2>בדיקת זכאות לפיצוי</h2>
+
+<input id="base" placeholder="מחזור בסיס">
+<input id="current" placeholder="מחזור בתקופה">
+<input id="inputs" placeholder="תשומות שנתיות">
+<input id="wages" placeholder="שכר עובדים">
+<input id="employees" placeholder="מספר עובדים">
+
+<button onclick="calc()">חשב פיצוי</button>
+
+<div class="result" id="res"></div>
+
+<hr>
+
+<h3>בדיקה מקצועית</h3>
+<input id="name" placeholder="שם">
+<input id="phone" placeholder="טלפון">
+<button onclick="sendLead()">שלח לבדיקה</button>
+
+<button onclick="downloadPDF()">הורד PDF</button>
+</div>
+
+<script>
+function calc(){
+  let base = +document.getElementById("base").value;
+  let current = +document.getElementById("current").value;
+
+  let drop = (base-current)/base;
+  if(drop <= 0.25){
+    res.innerText = "אין זכאות";
+    return;
+  }
+
+  let factor = drop<=0.4?0.07:drop<=0.6?0.11:drop<=0.8?0.15:0.22;
+
+  let inputs = +document.getElementById("inputs").value;
+  let fixed = (inputs/6)*factor;
+
+  let wages = +document.getElementById("wages").value;
+  let employees = +document.getElementById("employees").value;
+
+  let wageCalc = Math.min(wages*0.75*1.25, 12000*employees*1.25)*drop;
+
+  let total = Math.min(fixed + wageCalc, 1200000);
+
+  res.innerText = "פיצוי משוער: ₪"+Math.round(total);
+}
+
+async function sendLead(){
+  await fetch("https://your-api.com/leads",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      name:name.value,
+      phone:phone.value
+    })
+  });
+  alert("נשלח!");
+}
+
+function downloadPDF(){
+  window.print();
+}<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>בדיקת זכאות לפיצוי</title>
+
+<style>
+body{
+  font-family:Arial;
+  background:linear-gradient(135deg,#e8f0f2,#f7f7f7);
+  margin:0;
+}
+
+.card{
+  max-width:500px;
+  margin:50px auto;
+  background:white;
+  padding:25px;
+  border-radius:20px;
+  box-shadow:0 15px 40px rgba(0,0,0,0.1);
+}
+
+h2{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+input{
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  border:1px solid #ddd;
+  border-radius:10px;
+  font-size:14px;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border:none;
+  border-radius:10px;
+  background:#0e6b71;
+  color:white;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#0c585e;
+}
+
+.result{
+  margin-top:15px;
+  font-size:22px;
+  font-weight:bold;
+  color:#0e6b71;
+  text-align:center;
+}
+
+.cta{
+  background:#fff3cd;
+  padding:15px;
+  border-radius:12px;
+  margin-top:15px;
+  text-align:center;
+  font-size:14px;
+}
+
+.highlight{
+  color:#d9534f;
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h2>💰 בדיקת זכאות לפיצוי</h2>
+
+<input id="base" placeholder="מחזור בסיס">
+<input id="current" placeholder="מחזור בתקופה">
+<input id="inputs" placeholder="תשומות שנתיות">
+<input id="wages" placeholder="שכר עובדים">
+<input id="employees" placeholder="מספר עובדים">
+
+<button onclick="calc()">חשב פיצוי</button>
+
+<div id="leadGate">
+  <input id="name" placeholder="שם מלא">
+  <input id="phone" placeholder="טלפון">
+  <button onclick="saveLead()">בדיקה מקצועית</button>
+</div>
+
+<div id="rComp" class="result"></div>
+
+<div class="cta">
+⚠️ במקרים רבים ניתן להגדיל את הפיצוי בעשרות אחוזים  
+<br><br>
+<button onclick="saveLead()">בדיקה מלאה ע"י רו"ח</button>
+</div>
+
+<button onclick="generatePDF()">📄 הורד PDF</button>
+
+</div>
+
+<script>
+function calc(){
+  let base = +document.getElementById("base").value;
+  let current = +document.getElementById("current").value;
+
+  let drop = (base-current)/base;
+
+  if(drop <= 0.25){
+    rComp.innerHTML = "❌ אין זכאות";
+    return;
+  }
+
+  let factor = drop<=0.4?0.07:drop<=0.6?0.11:drop<=0.8?0.15:0.22;
+
+  let inputs = +document.getElementById("inputs").value;
+  let fixed = (inputs/6)*factor;
+
+  let wages = +document.getElementById("wages").value;
+  let employees = +document.getElementById("employees").value;
+
+  let wage = Math.min(wages*0.75*1.25, 12000*employees*1.25)*drop;
+
+  let total = Math.min(fixed + wage, 1200000);
+
+  rComp.innerHTML = "✅ פיצוי משוער: ₪"+Math.round(total);
+}
+
+async function saveLead(){
+  const data = {
+    name: document.getElementById("name").value,
+    phone: document.getElementById("phone").value,
+    result: document.getElementById("rComp").innerText
+  };
+
+  // 🔗 שליחה לגוגל שיטס (להחליף URL)<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>בדיקת זכאות לפיצוי</title>
+
+<style>
+body{
+  font-family:Arial;
+  background:linear-gradient(135deg,#e8f0f2,#f7f7f7);
+  margin:0;
+}
+
+.card{
+  max-width:500px;
+  margin:50px auto;
+  background:white;
+  padding:25px;
+  border-radius:20px;
+  box-shadow:0 15px 40px rgba(0,0,0,0.1);
+}
+
+h2{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+input{
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  border:1px solid #ddd;
+  border-radius:10px;
+  font-size:14px;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border:none;
+  border-radius:10px;
+  background:#0e6b71;
+  color:white;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#0c585e;
+}
+
+.result{
+  margin-top:15px;
+  font-size:22px;
+  font-weight:bold;
+  color:#0e6b71;
+  text-align:center;
+}
+
+.cta{
+  background:#fff3cd;
+  padding:15px;
+  border-radius:12px;
+  margin-top:15px;
+  text-align:center;
+  font-size:14px;
+}
+
+.highlight{
+  color:#d9534f;
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h2>💰 בדיקת זכאות לפיצוי</h2>
+
+<input id="base" placeholder="מחזור בסיס">
+<input id="current" placeholder="מחזור בתקופה">
+<input id="inputs" placeholder="תשומות שנתיות">
+<input id="wages" placeholder="שכר עובדים">
+<input id="employees" placeholder="מספר עובדים">
+
+<button onclick="calc()">חשב פיצוי</button>
+
+<div id="leadGate">
+  <input id="name" placeholder="שם מלא">
+  <input id="phone" placeholder="טלפון">
+  <button onclick="saveLead()">בדיקה מקצועית</button>
+</div>
+
+<div id="rComp" class="result"></div>
+
+<div class="cta">
+⚠️ במקרים רבים ניתן להגדיל את הפיצוי בעשרות אחוזים  
+<br><br>
+<button onclick="saveLead()">בדיקה מלאה ע"י רו"ח</button>
+</div>
+
+<button onclick="generatePDF()">📄 הורד PDF</button>
+
+</div>
+
+<script>
+function calc(){
+  let base = +document.getElementById("base").value;
+  let current = +document.getElementById("current").value;
+
+  let drop = (base-current)/base;
+
+  if(drop <= 0.25){
+    rComp.innerHTML = "❌ אין זכאות";
+    return;
+  }
+
+  let factor = drop<=0.4?0.07:drop<=0.6?0.11:drop<=0.8?0.15:0.22;
+
+  let inputs = +document.getElementById("inputs").value;
+  let fixed = (inputs/6)*factor;
+
+  let wages = +document.getElementById("wages").value;
+  let employees = +document.getElementById("employees").value;
+
+  let wage = Math.min(wages*0.75*1.25, 12000*employees*1.25)*drop;
+
+  let total = Math.min(fixed + wage, 1200000);
+
+  rComp.innerHTML = "✅ פיצוי משוער: ₪"+Math.round(total);
+}
+
+async function saveLead(){
+  const data = {
+    name: document.getElementById("name").value,
+    phone: document.getElementById("phone").value,
+    result: document.getElementById("rComp").innerText
+  };
+
+  // 🔗 שליחה לגוגל שיטס (להחליף URL)
+  await fetch("https://YOUR_SCRIPT_URL", {
+    method:"POST",
+    body: JSON.stringify(data)
+  });
+
+  // 📲 וואטסאפ
+  window.open(`https://wa.me/972XXXXXXXXX?text=שלום ${data.name}, ראיתי שבדקת זכאות לפיצוי. רוצה בדיקה מקצועית?`);
+
+  document.getElementById("leadGate").style.display="none";
+}
+
+function generatePDF(){
+  window.print();
+}
+</script>
+
+</body>
+</html>
+  await fetch("https://YOUR_SCRIPT_URL", {
+    method:"POST",
+    body: JSON.stringify(data)
+  });
+
+  // 📲 וואטסאפ
+  window.open(`https://wa.me/972XXXXXXXXX?text=שלום ${data.name}, ראיתי שבדקת זכאות לפיצוי. רוצה בדיקה מקצועית?`);
+
+  document.getElementById("leadGate").style.display="none";
+}
+
+function generatePDF(){
+  window.print();
+}
+</script>
+
+</body>
+</html>
+</script>
+</body>
+</html>
